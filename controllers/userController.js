@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const userModels = require('../models/userModel');
 const userDetail = require('../models/userDetail');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 
 const { log } = require('console');
@@ -26,7 +27,7 @@ const addUser = async (req, res) => {
 
         return res.status(400).json({ errors: errorMessages });
     }
-    const { id, name, contactNo, address ,password} = req.body;
+    const { id, name, contactNo, address,email ,password} = req.body;
 
     try {    
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,23 +36,20 @@ const addUser = async (req, res) => {
             name:name,
             contactNo: contactNo,
             address: address,
+            email: email,
             password: hashedPassword,
-            profileImage: {
-                data: imageBuffer,
-                contentType: req.file.mimetype
-            }
         })
         const saveUser =await userData.save();
        
-        const profile = new userDetail({
-            user_id:saveUser._id,
-            age:age,
-            permanatAddress: permanatAddress,
-            city: city,
-            state: state
-        })
+        // const profile = new userDetail({
+        //     user_id:saveUser._id,
+        //     age:age,
+        //     permanatAddress: permanatAddress,
+        //     city: city,
+        //     state: state
+        // })
 
-        res.send("Successfully added");
+        res.status(200).send("User successfully registered");
     } catch (error) {
         res.status(500).send(error.message);   
     }
@@ -76,15 +74,16 @@ const updateUser = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const {name,password} = req.body;
+    const {email,password} = req.body;
     try {
-        const data = await userModels.findOne({name:name});
+        const JWT_SECRET = '874f980bddb9f13c8603219885945c62b3ec0c0788376a60db27e9370934ff8e50706b003fde5787fafc0a2473e073be0ff9e2769c846667f6b4d958bace9124';
+        const data = await userModels.findOne({email:email});
         var passwordIsValid = bcrypt.compareSync(password,data.password);
         if(!passwordIsValid){
             res.status(500).send("password is invalid");
         }else{
-            res.status(200).send({user:{id:data.id}});
-            
+            const token = jwt.sign({ userId: data._id }, JWT_SECRET, { expiresIn: '1h' });
+            res.status(200).send({ message: "Login successful", token });            
         }
         
     } catch (error) {

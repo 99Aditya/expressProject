@@ -1,15 +1,15 @@
 const mongoose =require('mongoose');
-
-const userSchema = mongoose.Schema({
-    id:Number,
-    name:String,
-    contactNo: Number,
-    address:String,
-    password:String,
-    imageUrl: String, // Add a field to store the image URL
-    passportPhoto: String // Add a field to store the image URL
-
+const userSchema = new mongoose.Schema({
+    id: { type: Number, required: true },
+    name: { type: String, required: true },
+    contactNo: { type: Number, required: true },
+    address: { type: String, required: true },
+    password: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    imageUrl: { type: String },
+    passportPhoto: { type: String }
 });
+
  const users = mongoose.model('users', userSchema);
 
 module.exports = users;

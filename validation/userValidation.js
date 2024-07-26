@@ -27,6 +27,21 @@ const registrationSchema = {
         notEmpty: true,
         errorMessage: "Phone number cannot be empty"
     },
+    email: {
+        custom: {
+            options: value => {
+                return userModels.find({
+                    email: value
+                }).then(email => {
+                    if (email.length > 0) {
+                        return Promise.reject('Email already in use')
+                    }
+                })
+            }
+        },
+        notEmpty: true,
+        errorMessage: "Email cannot be empty"
+    },
     address: {
         notEmpty: true,
         errorMessage: "Address cannot be empty"

@@ -4,10 +4,11 @@ const userController = require('../controllers/userController.js');
 const {registrationSchema} = require('../validation/userValidation.js');
 const userDetailController = require('../controllers/userDetailController.js');
 const upload = require('../middleware/multerConfig.js'); // Import multer middleware
+const authtoken =  require('../middleware/authtoken.js'); // Import auth token middleware
 
 routes.get('/', userController.getUsers);
 routes.post('/add',registrationSchema, userController.addUser);
-routes.post('/update', userController.updateUser);
+routes.post('/update',authtoken,userController.updateUser);
 routes.post('/login', userController.login);
 
 routes.post('/userDetailSave', userDetailController.userDetailAdd);
